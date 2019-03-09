@@ -46,12 +46,20 @@ function resetReducer(state, action) {
 }
 
 function playCardReducer(state, action) {
+	console.log('playCard runs');
 	if (action.type !== PLAY_CARD) {
 		return state;
 	} else {
-		const table = state.player1.table;
-		const card = action.payload.playedCard;
+		console.log('playCard init state', state.player1);
+		const table = state.player1.table.slice();
+		const hand = state.player1.hand.slice();
+		const i = action.payload.playedCard;
+		const card = hand[i];
+		if (!_.isFinite(card)) {
+			throw new Error('Illegal move');
+		}
 		table.push(card);
+		hand[i] = '';
 		// keeping _.sum(table) instead of state.table in case of flip cards
 		if (_.sum(table) === 20) {
 			const newState = {
@@ -59,10 +67,12 @@ function playCardReducer(state, action) {
 				player1: {
 					...state.player1,
 					table,
+					hand,
 					total: _.sum(table),
 					stand: true,
 				},
 			};
+			console.log('playCard End State', newState.player1);
 			return newState;
 		} else {
 			const newState = {
@@ -70,21 +80,23 @@ function playCardReducer(state, action) {
 				player1: {
 					...state.player1,
 					table,
+					hand,
 					total: _.sum(table),
 				},
 			};
+			console.log('playCard End State', newState.player1);
 			return newState;
 		}
 	}
 }
 
 function takeHitReducer(state, action) {
-	console.log('initState', state);
+	console.log('takeHit runs');
 	if (action.type !== TAKE_HIT) {
 		return state;
 	} else {
+		console.log('takeHit Init State', 'Dealer topcard:', state.dealerDeck[state.dealerDeck.length - 1], state.player1);
 		const table = state.player1.table.slice();
-		console.log('tablesum', table, _.sum(table));
 		const deckCopy = state.dealerDeck.slice();
 		const card = deckCopy.pop();
 		table.push(card);
@@ -100,7 +112,7 @@ function takeHitReducer(state, action) {
 					stand: true,
 				},
 			};
-			// console.log('End State', newState);
+			console.log('takeHit End State', 'Dealer topcard:', newState.dealerDeck[newState.dealerDeck.length - 1], newState.player1);
 			return newState;
 		} else {
 			const newState = {
@@ -112,8 +124,7 @@ function takeHitReducer(state, action) {
 					total: _.sum(table),
 				},
 			};
-			console.log('Sum Table', _.sum(table));
-			console.log('End State', newState);
+			console.log('takeHit End State', 'Dealer topcard:', newState.dealerDeck[newState.dealerDeck.length - 1], newState.player1);
 			return newState;
 		}
 	}
