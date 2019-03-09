@@ -4,7 +4,7 @@ import gameReducer from './gameReducer';
 
 import isValidGamestate from '../models/isValidGamestate';
 
-import { PLAY_CARD } from '../actions/userAction';
+import { PLAY_CARD, TAKE_HIT } from '../actions/userAction';
 
 const assert = vet.utils.assert;
 
@@ -20,19 +20,27 @@ describe(
 		it('can import gameState', () => {});
 
 		it('initial state is valid', () => {
-			let state = gameReducer();
+			const state = gameReducer();
 			// state = gameReducer(state, {});
 			assertIsValidGamestate(state);
 		});
 
 		it('can play a card', () => {
 			let state = gameReducer();
-			let action = {
+			const action = {
 				type: PLAY_CARD,
-				payload: { playedCard: 1 },
+				payload: { playedCard: 2 },
 			};
 			state = gameReducer(state, action);
+			assertIsValidGamestate(state);
+		});
 
+		it('can take hit', () => {
+			let state = gameReducer();
+			const action = {
+				type: TAKE_HIT,
+			};
+			state = gameReducer(state, action);
 			assertIsValidGamestate(state);
 		});
 	}

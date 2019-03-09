@@ -8,15 +8,15 @@ const isAtMost = (a) => (val) => vet.numbers.isNumber(val) && val <= a;
 
 export default matches(
 	{
-		dealerDeck: vet.arrays.isLength(40),
+		dealerDeck: isAtMostLength(40),
 		player1: {
-			playerTable: vet.arrays.isArray,
-			playerHand: optional(isAtMostLength(4)),
-			playerTotal: vet.number.isNumber,
-			playerWins: vet.number.isNumber,
+			table: (isAtMostLength(4)),
+			hand: optional(isAtMostLength(4)),
+			total: vet.number.isNumber,
+			stand: vet.booleans.isBoolean,
+			wins: isAtMost(3),
 		},
-		round: isAtMost(3),
-		turn: vet.number.isNumber,
+		firstTurn: vet.string.isString,
 	}
 );
 

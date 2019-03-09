@@ -28,13 +28,13 @@ function debugReducer(state, action) {
 const initialState = {
 	dealerDeck: shuffle(DEALER_LIBRARY),
 	player1: {
-		playerTable: [],
-		playerHand: shuffle(DEALER_LIBRARY).slice(0, 4),
-		playerTotal: 0,
-		playerWins: 0,
+		table: [],
+		hand: shuffle(PLAYER_LIBRARY).slice(0, 4),
+		total: 0,
+		stand: false,
+		wins: 0,
 	},
-	round: 0,
-	turn: 1,
+	firstTurn: 'player1',
 };
 
 function resetReducer(state, action) {
@@ -49,42 +49,81 @@ function playCardReducer(state, action) {
 	if (action.type !== PLAY_CARD) {
 		return state;
 	} else {
-		const table = state.player1.playerTable;
+		const table = state.player1.table;
 		const card = action.payload.playedCard;
 		table.push(card);
-		// if (result.reduce((a, b) => a + b) === 20) {
-		// 	// TODO: WRITE WIN REDUCER
-		// 	const newState = {
-		// 		...state,
-		// 		player1: {
-		// 			playerWins: state.player1.playerWins + 1,
-		// 		},
-		// 	};
-		// 	return newState;
-		// } else {
-		// 	const newState = {
-		// 		...state,
-		// 		player1: {
-						// ...state.player1,
-		//			playerTable: table,
-		// 		},
-		// 	};
-		// 	return newState;
-		// }
-		const newState = {
-			...state,
-			player1: {
-				...state.player1,
-				playerTable: table,
-			},
-		};
-		return newState;
+		// keeping _.sum(table) instead of state.table in case of flip cards
+		if (_.sum(table) === 20) {
+			const newState = {
+				...state,
+				player1: {
+					...state.player1,
+					table,
+					total: _.sum(table),
+					stand: true,
+				},
+			};
+			return newState;
+		} else {
+			const newState = {
+				...state,
+				player1: {
+					...state.player1,
+					table,
+					total: _.sum(table),
+				},
+			};
+			return newState;
+		}
 	}
 }
+
+function takeHitReducer(state, action) {
+	console.log('initState', state);
+	if (action.type !== TAKE_HIT) {
+		return state;
+	} else {
+		const table = state.player1.table.slice();
+		console.log('tablesum', table, _.sum(table));
+		const deckCopy = state.dealerDeck.slice();
+		const card = deckCopy.pop();
+		table.push(card);
+		// keeping _.sum(table) instead of state.table in case of flip cards
+		if (_.sum(table) === 20) {
+			const newState = {
+				...state,
+				dealerDeck: deckCopy,
+				player1: {
+					...state.player1,
+					table,
+					total: _.sum(table),
+					stand: true,
+				},
+			};
+			// console.log('End State', newState);
+			return newState;
+		} else {
+			const newState = {
+				...state,
+				dealerDeck: deckCopy,
+				player1: {
+					...state.player1,
+					table,
+					total: _.sum(table),
+				},
+			};
+			console.log('Sum Table', _.sum(table));
+			console.log('End State', newState);
+			return newState;
+		}
+	}
+}
+
 
 export default reduceReducers(
 	resetReducer,
 	playCardReducer,
+	takeHitReducer,
 	// codeGenReducer,
 	// debugReducer,
 	initialState

@@ -20,6 +20,10 @@ setup:
 run:
 	$(NPM) run dev
 
+## tests - run any .mocha.test.js files
+##
+tests:
+	$(NPM) run tests
 
 build-js:
 	BUILD_DIR=$(BUILD_DIR) $(NPM) run build
@@ -38,7 +42,7 @@ build: build-js build-favicon build-index
 ##	To run just one test: mocha ./src/**/*.tests.js --grep FileName
 ##
 tests:
-	(export NODE_PATH=./; find ./src -name '*.tests.js' | xargs mocha --timeout 10000 $(ARGS))
+	(export NODE_PATH=./; find ./src -name './src/**/*.mocha.tests.js' | xargs mocha --timeout 10000 $(ARGS))
 
 test:
-		(export NODE_PATH=./; find ./src -name '*.tests.js' | xargs mocha --timeout 10000 --grep=$(NAME))
+		(export NODE_PATH=./; find ./src -name './src/**/*.mocha.tests.js' | xargs mocha --timeout 10000 --grep=$(NAME))
