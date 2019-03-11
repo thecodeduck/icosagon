@@ -14,9 +14,15 @@ export default matches(
 			hand: optional(isAtMostLength(4)),
 			total: vet.number.isNumber,
 			stand: vet.booleans.isBoolean,
-			wins: isAtMost(3),
+			// wins: isAtMost(3),
+			wins: vet.number.isNumber,
+			losses: vet.number.isNumber,
 		},
-		firstTurn: vet.string.isString,
+		modal: {
+			shown: vet.booleans.isBoolean,
+			text: vet.strings.isString,
+			button: vet.functions.isFunction,
+		},
 	}
 );
 

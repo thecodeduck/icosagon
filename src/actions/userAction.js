@@ -3,6 +3,7 @@ export const TAKE_HIT = 'user:takeHit';
 export const RESET_GAME = 'user:resetGame';
 export const STAND = 'user:stand';
 export const NEW_ROUND = 'user:newRound';
+export const CLOSE_MODAL = 'user:closeModal';
 
 export function playCard(playedCard) {
 	return {
@@ -30,5 +31,11 @@ export function resetGame() {
 export function newRound() {
 	return {
 		type: NEW_ROUND,
+	};
+}
+
+export function closeModal() {
+	return {
+		type: CLOSE_MODAL,
 	};
 }
