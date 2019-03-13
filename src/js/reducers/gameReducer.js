@@ -46,7 +46,7 @@ const initialState = {
 	modal: {
 		shown: false,
 		text: 'Something went wrong',
-		button: closeModal,
+		action: 'closeModal',
 	},
 };
 
@@ -66,7 +66,7 @@ function evalWinReducer(state) {
 			modal: {
 				shown: true,
 				text: 'Bust',
-				button: newRound,
+				action: 'newRound',
 			},
 		};
 		return newState;
@@ -80,28 +80,12 @@ function evalWinReducer(state) {
 			modal: {
 				shown: true,
 				text: 'You Win!',
-				button: newRound,
+				action: 'newRound',
 			},
 		};
 		return newState;
 	} else {
 		return state;
-	}
-}
-
-function closeModalReducer(state, action) {
-	if (action.type !== CLOSE_MODAL) {
-		return state;
-	} else {
-		const newState = {
-			...state,
-			modal: {
-				shown: false,
-				text: 'Something went wrong',
-				button: closeModal,
-			},
-		};
-		return newState;
 	}
 }
 
@@ -238,6 +222,43 @@ function takeHitReducer(state, action) {
 			};
 			return newState;
 		}
+	}
+}
+
+function closeModalReducer(state, action) {
+	if (action.type !== CLOSE_MODAL) {
+		return state;
+	} else {
+		let newState;
+		const statement = state.modal.action;
+		switch (statement) {
+			case 'closeModal': {
+				newState = {
+					...state,
+					modal: {
+						shown: false,
+						text: 'Something went wrong',
+						button: closeModal,
+					},
+				};
+				break; }
+			case 'newRound': {
+				const act = {
+					type: NEW_ROUND,
+				};
+				newState = newRoundReducer(state, act);
+				break; }
+			default:
+				newState = {
+					...state,
+					modal: {
+						shown: false,
+						text: 'Something went wrong',
+						button: closeModal,
+					},
+				};
+		}
+		return newState;
 	}
 }
 
