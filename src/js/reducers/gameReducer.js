@@ -3,25 +3,7 @@ import reduceReducers from 'reduce-reducers';
 
 // import isValidGamestate from '../models/isValidGamestate';
 import { DEALER_LIBRARY, PLAYER_LIBRARY, shuffle } from '../models/shuffle';
-import { PLAY_CARD, TAKE_HIT, RESET_GAME, STAND, NEW_ROUND, CLOSE_MODAL, newRound, closeModal } from '../actions/userAction';
-
-// function codeGenReducer(state, action) {
-// 	// console.lozg('codeGenReducer', state, action);
-// 	if (state.code) {
-// 		return state;
-// 	} else {
-// 		const code = codeGen(state.wins);
-// 		const newState = { ...state, code };
-// 		return newState;
-// 	}
-// }
-
-// const EVAL_WIN = {
-// 	type: 'game:evalWin',
-// 	// payload: {
-// 	// 	playedCard,
-// 	// },
-// };
+import { PLAY_CARD, TAKE_HIT, RESET_GAME, STAND, NEW_ROUND, CLOSE_MODAL } from '../actions/userAction';
 
 const PLAYED_CARD = undefined;
 
@@ -32,6 +14,26 @@ const PLAYED_CARD = undefined;
 // 	}
 // 	return state;
 // }
+
+// const USER_REDUCER_MAP = {
+// 	'user:playCard': (state, action) => { ... },
+// 	'user:hit': (state, action) => { ... },
+// 	[NEW_ROUND]: newRoundReducer,
+// };
+
+// const multiplexReducers = (reducerMap) =>
+// 	(state, action) =>
+// 	(reducerMap[action.type] || reducerMap.default || (s => s))(state, action);
+
+// // closure is a function with a partially bound namespace
+// // currying
+// (a) => (b) => a + b;
+
+// function (a) {
+// 	return function (b) {
+// 		return a + b;
+// 	};
+// };
 
 const initialState = {
 	dealerDeck: shuffle(DEALER_LIBRARY),
@@ -238,15 +240,12 @@ function closeModalReducer(state, action) {
 					modal: {
 						shown: false,
 						text: 'Something went wrong',
-						button: closeModal,
+						action: 'closeModal',
 					},
 				};
 				break; }
 			case 'newRound': {
-				const act = {
-					type: NEW_ROUND,
-				};
-				newState = newRoundReducer(state, act);
+				newState = newRoundReducer(state, { type: NEW_ROUND });
 				break; }
 			default:
 				newState = {
@@ -254,7 +253,7 @@ function closeModalReducer(state, action) {
 					modal: {
 						shown: false,
 						text: 'Something went wrong',
-						button: closeModal,
+						action: 'closeModal',
 					},
 				};
 		}

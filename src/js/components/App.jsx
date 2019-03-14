@@ -36,18 +36,18 @@ class App extends React.Component {
 		//eslint-disable-next-line
 		this.props.modalButton(evt);
 	}
-	renderTable(arg, i) {
+	renderTable(card, i) {
 		return (
 			<React.Fragment>
-				<p>{arg}</p>
+				<p>{card}</p>
 			</React.Fragment>
 		);
 	}
-	renderHand(arg, i) {
+	renderHand(card, i) {
 		return (
 			<React.Fragment>
-				<button type="button" name={i} onClick={this.onPlayCard}>
-					{arg}
+				<button type="button" name={i} onClick={this.onPlayCard} disabled={this.props.modalShown}>
+					{card}
 				</button>
 			</React.Fragment>
 		);
@@ -68,11 +68,11 @@ class App extends React.Component {
 				<hr />
 				<p>TOTAL: {this.props.total}</p>
 				{this.props.table.map(this.renderTable)}
-				<button onClick={this.onTakeHit}>Hit</button>
+				<button onClick={this.onTakeHit} disabled={this.props.modalShown}>Hit</button>
 				{this.props.hand.map(this.renderHand)}
 				<dialog style={modalStyle} id="modal">
 					<p>{this.props.modalText}</p>
-					<button onClick={this.modalButton}>Action</button>
+					<button onClick={this.modalButton}>New Round</button>
 				</dialog>
 			</div>
 		);
