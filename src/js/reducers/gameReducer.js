@@ -37,7 +37,16 @@ const PLAYED_CARD = undefined;
 
 const initialState = {
 	dealerDeck: shuffle(DEALER_LIBRARY),
+	turn: [ 'player1' ],
 	player1: {
+		table: [],
+		hand: shuffle(PLAYER_LIBRARY).slice(0, 4),
+		total: 0,
+		stand: false,
+		wins: 0,
+		losses: 0,
+	},
+	player2: {
 		table: [],
 		hand: shuffle(PLAYER_LIBRARY).slice(0, 4),
 		total: 0,
@@ -53,9 +62,9 @@ const initialState = {
 };
 
 function evalWinReducer(state) {
-	const total = state.player1.total;
-	const wins = state.player1.wins + 1;
-	const losses = state.player1.losses + 1;
+	const total = state.player1.total,
+		wins = state.player1.wins + 1,
+		losses = state.player1.losses + 1;
 	if (!state.player1.stand || total < 20) {
 		return state;
 	} else if (total > 20) {
@@ -102,6 +111,10 @@ function resetGameReducer(state, action) {
 				...initialState.player1,
 				hand: shuffle(PLAYER_LIBRARY).slice(0, 4),
 			},
+			player2: {
+				...initialState.player2,
+				hand: shuffle(PLAYER_LIBRARY).slice(0, 4),
+			},
 		};
 		return resetState;
 	}
@@ -132,10 +145,11 @@ function playerStand(state, action) {
 	if (action.type !== STAND) {
 		return state;
 	} else {
+		const player = state.turn[state.turn.length - 1];
 		const newState = {
 			...state,
-			player1: {
-				...state.player1,
+			[player]: {
+				...state[player],
 				stand: true,
 			},
 		};
@@ -149,43 +163,28 @@ function playCardReducer(state, action) {
 		return state;
 	} else {
 		// console.log('playCard init state', state.player1);
-		const table = state.player1.table.slice();
-		const hand = state.player1.hand.slice();
-		const i = action.payload.playedCard;
-		const card = hand[i];
+		const player = action.payload.player,
+			i = action.payload.playedCard,
+			table = state[player].table.slice(),
+			hand = state[player].hand.slice(),
+			card = hand[i];
 		if (!_.isFinite(card)) {
 			return state;
 		}
 		table.push(card);
 		hand[i] = PLAYED_CARD;
 		// keeping _.sum(table) instead of state.table in case of flip cards
-		if (_.sum(table) >= 20) {
-			let newState = {
-				...state,
-				player1: {
-					...state.player1,
-					table,
-					hand,
-					total: _.sum(table),
-					stand: true,
-				},
-			};
-			// console.log('playCard End State', newState.player1);
-			newState = evalWinReducer(newState);
-			return newState;
-		} else {
-			const newState = {
-				...state,
-				player1: {
-					...state.player1,
-					table,
-					hand,
-					total: _.sum(table),
-				},
-			};
-			// console.log('playCard End State', newState.player1);
-			return newState;
-		}
+		const newState = {
+			...state,
+			[player]: {
+				...state[player],
+				table,
+				hand,
+				total: _.sum(table),
+			},
+		};
+		// console.log('playCard End State', newState.player1);
+		return newState;
 	}
 }
 
@@ -194,36 +193,22 @@ function takeHitReducer(state, action) {
 	if (action.type !== TAKE_HIT) {
 		return state;
 	} else {
-		const table = state.player1.table.slice();
+		const player = action.payload.player;
+		const table = state[player].table.slice();
 		const deckCopy = state.dealerDeck.slice();
 		const card = deckCopy.pop();
 		table.push(card);
 		// keeping _.sum(table) instead of state.table in case of flip cards
-		if (_.sum(table) >= 20) {
-			let newState = {
-				...state,
-				dealerDeck: deckCopy,
-				player1: {
-					...state.player1,
-					table,
-					total: _.sum(table),
-					stand: true,
-				},
-			};
-			newState = evalWinReducer(newState);
-			return newState;
-		} else {
-			const newState = {
-				...state,
-				dealerDeck: deckCopy,
-				player1: {
-					...state.player1,
-					table,
-					total: _.sum(table),
-				},
-			};
-			return newState;
-		}
+		const newState = {
+			...state,
+			dealerDeck: deckCopy,
+			[player]: {
+				...state[player],
+				table,
+				total: _.sum(table),
+			},
+		};
+		return newState;
 	}
 }
 
@@ -261,6 +246,10 @@ function closeModalReducer(state, action) {
 	}
 }
 
+
+// function turnReducer(state, action) {
+// 	const currentPlayer = state.turn[state.turn.length - 1];
+// }
 
 export default reduceReducers(
 	resetGameReducer,

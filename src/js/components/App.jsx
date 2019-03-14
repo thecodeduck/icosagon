@@ -26,11 +26,11 @@ class App extends React.Component {
 	}
 	onPlayCard(evt) {
 		//eslint-disable-next-line
-		this.props.onPlayCard(evt.target.name);
+		this.props.onPlayCard('player1', evt.target.name);
 	}
 	onTakeHit(evt) {
 		//eslint-disable-next-line
-		this.props.onTakeHit(evt);
+		this.props.onTakeHit('player1', evt);
 	}
 	modalButton(evt) {
 		//eslint-disable-next-line

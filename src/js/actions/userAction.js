@@ -5,22 +5,29 @@ export const STAND = 'user:stand';
 export const NEW_ROUND = 'user:newRound';
 export const CLOSE_MODAL = 'user:closeModal';
 
-export function playCard(playedCard) {
+export function playCard(player, playedCard) {
 	return {
 		type: PLAY_CARD,
 		payload: {
+			player,
 			playedCard,
 		},
 	};
 }
-export function takeHit() {
+export function takeHit(player) {
 	return {
 		type: TAKE_HIT,
+		payload: {
+			player,
+		},
 	};
 }
-export function stand() {
+export function stand(player) {
 	return {
 		type: STAND,
+		payload: {
+			player,
+		},
 	};
 }
 export function resetGame() {
