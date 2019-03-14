@@ -62,12 +62,12 @@ const initialState = {
 };
 
 function evalWinReducer(state) {
+	console.log('eval runs');
 	const total = state.player1.total,
 		wins = state.player1.wins + 1,
 		losses = state.player1.losses + 1;
-	if (!state.player1.stand || total < 20) {
-		return state;
-	} else if (total > 20) {
+	console.log('eval total', total);
+	if (total > 20) {
 		const newState = {
 			...state,
 			player1: {
@@ -80,6 +80,7 @@ function evalWinReducer(state) {
 				action: 'newRound',
 			},
 		};
+		console.log('eval', newState);
 		return newState;
 	} else if (total === 20) {
 		const newState = {
@@ -94,8 +95,10 @@ function evalWinReducer(state) {
 				action: 'newRound',
 			},
 		};
+		console.log('eval', newState);
 		return newState;
 	} else {
+		console.log('eval', state);
 		return state;
 	}
 }
@@ -247,16 +250,49 @@ function closeModalReducer(state, action) {
 }
 
 
-// function turnReducer(state, action) {
-// 	const currentPlayer = state.turn[state.turn.length - 1];
-// }
+function turnReducer(state, action) {
+	const currentPlayer = state.turn[state.turn.length - 1];
+	let newState;
+	if (!state[currentPlayer].stand && state[currentPlayer].total < 20) {
+		newState = takeHitReducer(state, {
+			type: TAKE_HIT,
+			payload: {
+				player: [ currentPlayer ],
+			},
+		});
+		if (action.type === PLAY_CARD) {
+			newState = playCardReducer(state, {
+				type: PLAY_CARD,
+				payload: {
+					...action.payload,
+					player: [ currentPlayer ],
+				},
+			});
+		} else if (action.type === STAND) {
+			newState = playerStand(state, {
+				type: STAND,
+				payload: {
+					player: [ currentPlayer ],
+				},
+			});
+		}
+		console.log(newState[currentPlayer].stand);
+		console.log(state[currentPlayer].total);
+	} else if (state[currentPlayer].stand || state[currentPlayer].total >= 20) {
+		console.log('checkRunEval');
+		newState = evalWinReducer(state);
+	}
+	console.log('return');
+	return newState;
+}
 
 export default reduceReducers(
 	resetGameReducer,
 	newRoundReducer,
-	playCardReducer,
-	takeHitReducer,
-	playerStand,
+	turnReducer,
+	// playCardReducer,
+	// takeHitReducer,
+	// playerStand,
 	closeModalReducer,
 	// debugReducer,
 	initialState
