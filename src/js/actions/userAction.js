@@ -1,5 +1,6 @@
 export const PLAY_CARD = 'user:playCard';
 export const TAKE_HIT = 'user:takeHit';
+export const END_TURN = 'user:endTurn';
 export const RESET_GAME = 'user:resetGame';
 export const STAND = 'user:stand';
 export const NEW_ROUND = 'user:newRound';
@@ -25,6 +26,14 @@ export function takeHit(player) {
 export function stand(player) {
 	return {
 		type: STAND,
+		payload: {
+			player,
+		},
+	};
+}
+export function endTurn(player) {
+	return {
+		type: END_TURN,
 		payload: {
 			player,
 		},

@@ -3,7 +3,7 @@ import reduceReducers from 'reduce-reducers';
 
 // import isValidGamestate from '../models/isValidGamestate';
 import { DEALER_LIBRARY, PLAYER_LIBRARY, shuffle } from '../models/shuffle';
-import { PLAY_CARD, TAKE_HIT, RESET_GAME, STAND, NEW_ROUND, CLOSE_MODAL } from '../actions/userAction';
+import { PLAY_CARD, TAKE_HIT, END_TURN, RESET_GAME, STAND, NEW_ROUND, CLOSE_MODAL } from '../actions/userAction';
 
 const PLAYED_CARD = undefined;
 
@@ -62,11 +62,9 @@ const initialState = {
 };
 
 function evalWinReducer(state) {
-	console.log('eval runs');
 	const total = state.player1.total,
 		wins = state.player1.wins + 1,
 		losses = state.player1.losses + 1;
-	console.log('eval total', total);
 	if (total > 20) {
 		const newState = {
 			...state,
@@ -80,7 +78,6 @@ function evalWinReducer(state) {
 				action: 'newRound',
 			},
 		};
-		console.log('eval', newState);
 		return newState;
 	} else if (total === 20) {
 		const newState = {
@@ -95,10 +92,8 @@ function evalWinReducer(state) {
 				action: 'newRound',
 			},
 		};
-		console.log('eval', newState);
 		return newState;
 	} else {
-		console.log('eval', state);
 		return state;
 	}
 }
@@ -144,11 +139,11 @@ function newRoundReducer(state, action) {
 	}
 }
 
-function playerStand(state, action) {
+function playerStandReducer(state, action) {
 	if (action.type !== STAND) {
 		return state;
 	} else {
-		const player = state.turn[state.turn.length - 1];
+		const player = action.payload.player;
 		const newState = {
 			...state,
 			[player]: {
@@ -249,9 +244,27 @@ function closeModalReducer(state, action) {
 	}
 }
 
+function endTurnReducer(state, action) {
+	if (action.type !== END_TURN) {
+		return state;
+	} else {
+		const player = action.payload.player,
+			turn = state.turn.slice();
+		turn.push(player);
+		// TODO: WRITE IN player2
+		const newState = {
+			...state,
+			turn,
+		};
+		return newState;
+	}
+}
 
 function turnReducer(state, action) {
 	const currentPlayer = state.turn[state.turn.length - 1];
+	// if (action.payload.player === currentPlayer) {
+	// 	throw new Error('Player mismatch');
+	// }
 	let newState;
 	if (!state[currentPlayer].stand && state[currentPlayer].total < 20) {
 		newState = takeHitReducer(state, {
@@ -260,29 +273,24 @@ function turnReducer(state, action) {
 				player: [ currentPlayer ],
 			},
 		});
-		if (action.type === PLAY_CARD) {
-			newState = playCardReducer(state, {
-				type: PLAY_CARD,
-				payload: {
-					...action.payload,
-					player: [ currentPlayer ],
+		if (newState[currentPlayer].total < 20 || newState[currentPlayer].total > 20) {
+			if (action.type === PLAY_CARD) {
+				newState = playCardReducer(state, action);
+			} else if (action.type === STAND) {
+				newState = playerStandReducer(state, action);
+			} else if (action.type === END_TURN) {
+				newState = endTurnReducer(state, action);
+			}
+		} else if (newState[currentPlayer].total === 20) {
+			newState = {
+				...newState,
+				[currentPlayer]: {
+					...newState[currentPlayer],
+					stand: true,
 				},
-			});
-		} else if (action.type === STAND) {
-			newState = playerStand(state, {
-				type: STAND,
-				payload: {
-					player: [ currentPlayer ],
-				},
-			});
+			};
 		}
-		console.log(newState[currentPlayer].stand);
-		console.log(state[currentPlayer].total);
-	} else if (state[currentPlayer].stand || state[currentPlayer].total >= 20) {
-		console.log('checkRunEval');
-		newState = evalWinReducer(state);
 	}
-	console.log('return');
 	return newState;
 }
 

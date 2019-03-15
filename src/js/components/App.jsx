@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 import { connect } from 'react-redux';
 
-import { playCard, takeHit, closeModal } from '../actions/userAction';
+import { playCard, endTurn, closeModal } from '../actions/userAction';
 
 class App extends React.Component {
 	constructor(props) {
@@ -91,7 +91,7 @@ const mapStateToProps = (state) => ({
 
 const mapActionsToProps = {
 	onPlayCard: playCard,
-	onTakeHit: takeHit,
+	onTakeHit: endTurn,
 	modalButton: closeModal,
 };
 
